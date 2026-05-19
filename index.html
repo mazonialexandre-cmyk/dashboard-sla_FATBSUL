@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard SLA OSs FATB SUL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, #00d4ff, #7b68ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .header .subtitle { color: #a0a0a0; font-size: 1rem; }
+        .header .update { color: #4ade80; font-size: 0.9rem; margin-top: 10px; }
+        
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .kpi-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .kpi-card.total { border-left: 4px solid #3b82f6; }
+        .kpi-card.critical { border-left: 4px solid #ef4444; }
+        .kpi-card.alert { border-left: 4px solid #f59e0b; }
+        .kpi-card.attention { border-left: 4px solid #eab308; }
+        .kpi-card.ok { border-left: 4px solid #22c55e; }
+        
+        .kpi-card .label { font-size: 0.85rem; color: #a0a0a0; margin-bottom: 8px; }
+        .kpi-card .value { font-size: 2.5rem; font-weight: 700; }
+        .kpi-card .percent { font-size: 0.9rem; color: #6b7280; margin-top: 5px; }
+        
+        .kpi-card.total .value { color: #3b82f6; }
+        .kpi-card.critical .value { color: #ef4444; }
+        .kpi-card.alert .value { color: #f59e0b; }
+        .kpi-card.attention .value { color: #eab308; }
+        .kpi-card.ok .value { color: #22c55e; }
+        
+        /* SLA Sections */
+        .sla-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .sla-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .sla-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .sla-header.critical { background: linear-gradient(90deg, #dc2626, #b91c1c); }
+        .sla-header.alert { background: linear-gradient(90deg, #d97706, #b45309); }
+        .sla-header.attention { background: linear-gradient(90deg, #ca8a04, #a16207); }
+        .sla-header.ok { background: linear-gradient(90deg, #16a34a, #15803d); }
+        
+        .sla-table { width: 100%; border-collapse: collapse; }
+        .sla-table th {
+            background: rgba(0,0,0,0.3);
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sla-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+        .sla-table tr:hover { background: rgba(255,255,255,0.03); }
+        .sla-table .qty {
+            font-weight: 700;
+            font-size: 1.1rem;
+            min-width: 50px;
+        }
+        .sla-table .resp {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .sla-total {
+            background: rgba(0,0,0,0.2);
+            padding: 12px 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+            .sla-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏢 DASHBOARD DE GESTÃO - SLA OSs FATB SUL</h1>
+            <div class="subtitle">Monitoramento e Análise de Performance Operacional</div>
+            <div class="update">✅ Atualizado: 18/05/2026 21:31 | BASE: OS Única PRISMA (219 OSs)</div>
+        </div>
+        
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card total">
+                <div class="label">TOTAL DE OSs</div>
+                <div class="value">219</div>
+                <div class="percent">ordens de serviço</div>
+            </div>
+            <div class="kpi-card critical">
+                <div class="label">90+ DIAS</div>
+                <div class="value">29</div>
+                <div class="percent">13%</div>
+            </div>
+            <div class="kpi-card alert">
+                <div class="label">60-90 DIAS</div>
+                <div class="value">34</div>
+                <div class="percent">16%</div>
+            </div>
+            <div class="kpi-card attention">
+                <div class="label">30-60 DIAS</div>
+                <div class="value">55</div>
+                <div class="percent">25%</div>
+            </div>
+            <div class="kpi-card ok">
+                <div class="label">-30 DIAS</div>
+                <div class="value">101</div>
+                <div class="percent">46%</div>
+            </div>
+        </div>
+        
+        <!-- SLA Tables Row 1 -->
+        <div class="sla-grid">
+            <!-- SLA 90+ CRÍTICO -->
+            <div class="sla-section">
+                <div class="sla-header critical">❌ SLA 90+ (CRÍTICO)</div>
+                <table class="sla-table">
+                    <thead>
+                        <tr><th>QTD</th><th>RESPONSÁVEL</th><th>AÇÃO INTERNA</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="qty">12</td><td><span class="resp">FATURA B</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">9</td><td><span class="resp">COMPRAS</span></td><td>PRAZO CHEGADA MATERIAL</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">COMPRAS</span></td><td>VALIDAÇÃO CHEGADA MATERIAL</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">OPERAÇÃO</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FATURA B</span></td><td>OS CONCLUÍDA</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FATURA B</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                    </tbody>
+                </table>
+                <div class="sla-total"><span>TOTAL</span><span>29</span></div>
+            </div>
+            
+            <!-- SLA 60-90 ALERTA -->
+            <div class="sla-section">
+                <div class="sla-header alert">⚠️ SLA 60-90 (ALERTA)</div>
+                <table class="sla-table">
+                    <thead>
+                        <tr><th>QTD</th><th>RESPONSÁVEL</th><th>AÇÃO INTERNA</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="qty">21</td><td><span class="resp">FATURA B</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">4</td><td><span class="resp">FATURA B</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">FATURA B</span></td><td>ALTERAR PRISMA PARA EXECUTADO</td></tr>
+                        <tr><td class="qty">2</td><td><span class="resp">FATURA B</span></td><td>ANALISE</td></tr>
+                        <tr><td class="qty">2</td><td><span class="resp">COMPRAS</span></td><td>AGUARDANDO OC</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">OPERAÇÃO</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FINANCEIRO</span></td><td>PROCESSAR NF</td></tr>
+                    </tbody>
+                </table>
+                <div class="sla-total"><span>TOTAL</span><span>34</span></div>
+            </div>
+        </div>
+        
+        <!-- SLA Tables Row 2 -->
+        <div class="sla-grid">
+            <!-- SLA 30-60 ATENÇÃO -->
+            <div class="sla-section">
+                <div class="sla-header attention">📊 SLA 30-60 (ATENÇÃO)</div>
+                <table class="sla-table">
+                    <thead>
+                        <tr><th>QTD</th><th>RESPONSÁVEL</th><th>AÇÃO INTERNA</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="qty">25</td><td><span class="resp">FATURA B</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">7</td><td><span class="resp">COMPRAS</span></td><td>ORÇAMENTO</td></tr>
+                        <tr><td class="qty">5</td><td><span class="resp">FATURA B</span></td><td>ANALISE</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">FATURA B</span></td><td>VIRAR APROVAÇÃO N2</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">OPERAÇÃO</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">FATURA B</span></td><td>ABRIR RM</td></tr>
+                        <tr><td class="qty">2</td><td><span class="resp">OPERAÇÃO</span></td><td>APROVAR N4</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">VERIFICAR</span></td><td>VERIFICAR</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FATURA B</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">COMPRAS</span></td><td>PRAZO CHEGADA MATERIAL</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">OPERAÇÃO</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FATURA B</span></td><td>ALTERAR PRISMA PARA EXECUTADO</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">COMPRAS</span></td><td>AGUARDANDO OC</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">FATURA B</span></td><td>PENDENTE APROV. SUPV.</td></tr>
+                    </tbody>
+                </table>
+                <div class="sla-total"><span>TOTAL</span><span>55</span></div>
+            </div>
+            
+            <!-- SLA -30 NO PRAZO -->
+            <div class="sla-section">
+                <div class="sla-header ok">✅ SLA -30 (NO PRAZO)</div>
+                <table class="sla-table">
+                    <thead>
+                        <tr><th>QTD</th><th>RESPONSÁVEL</th><th>AÇÃO INTERNA</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="qty">34</td><td><span class="resp">FATURA B</span></td><td>ABRIR RM</td></tr>
+                        <tr><td class="qty">11</td><td><span class="resp">FATURA B</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">10</td><td><span class="resp">COMPRAS</span></td><td>ORÇAMENTO</td></tr>
+                        <tr><td class="qty">9</td><td><span class="resp">FATURA B</span></td><td>ABRIR OBRA</td></tr>
+                        <tr><td class="qty">6</td><td><span class="resp">FATURA B</span></td><td>PENDENTE APROV. SUPV.</td></tr>
+                        <tr><td class="qty">6</td><td><span class="resp">COMPRAS</span></td><td>COTAÇÃO</td></tr>
+                        <tr><td class="qty">5</td><td><span class="resp">COMPRAS</span></td><td>PRAZO CHEGADA MATERIAL</td></tr>
+                        <tr><td class="qty">4</td><td><span class="resp">FATURA B</span></td><td>ANALISE</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">FATURA B</span></td><td>ATIVIDADE AGENDADA</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">COMPRAS</span></td><td>AGUARDANDO OC</td></tr>
+                        <tr><td class="qty">3</td><td><span class="resp">FATURA B</span></td><td>VIRAR APROVAÇÃO N2</td></tr>
+                        <tr><td class="qty">2</td><td><span class="resp">FATURA B</span></td><td>ALTERAR PRISMA PARA EXECUTADO</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">OPERAÇÃO</span></td><td>AGENDAR ATIVIDADE</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">ADM</span></td><td>ANALISE SOL</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">OPERAÇÃO</span></td><td>APROVAR N4</td></tr>
+                        <tr><td class="qty">1</td><td><span class="resp">OPERAÇÃO</span></td><td>APROVAR N3</td></tr>
+                    </tbody>
+                </table>
+                <div class="sla-total"><span>TOTAL</span><span>101</span></div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            Dashboard de Gestão SLA - FATB SUL | Dados estáticos exportados do Excel<br>
+            Para atualização dos dados, gere um novo arquivo HTML a partir do Excel
+        </div>
+    </div>
+</body>
+</html>
