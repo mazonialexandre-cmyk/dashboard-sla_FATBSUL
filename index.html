@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 20px;
@@ -15,24 +15,38 @@
         }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* Header */
+        /* Header - PRETO */
         .header {
-            text-align: center;
-            padding: 30px;
-            background: rgba(255,255,255,0.05);
+            background: #000000;
             border-radius: 15px;
             margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 30px;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            height: 50px;
+            max-width: 120px;
+            object-fit: contain;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
         }
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             background: linear-gradient(90deg, #00d4ff, #7b68ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        .header .subtitle { color: #a0a0a0; font-size: 1rem; }
-        .header .update { color: #4ade80; font-size: 0.9rem; margin-top: 10px; }
+        .header .subtitle { color: #a0a0a0; font-size: 0.95rem; }
+        .header .update { color: #4ade80; font-size: 0.85rem; margin-top: 8px; }
         
         /* KPIs */
         .kpi-grid {
@@ -140,20 +154,37 @@
         @media (max-width: 1024px) {
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
             .sla-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; gap: 15px; }
+            .logo { height: 40px; }
         }
         @media (max-width: 600px) {
             .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .header h1 { font-size: 1.5rem; }
+            .header h1 { font-size: 1.3rem; }
+            .logo { height: 35px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Header com Logotipos -->
         <div class="header">
-            <h1>🏢 DASHBOARD DE GESTÃO - SLA OSs FATB SUL</h1>
-            <div class="subtitle">Monitoramento e Análise de Performance Operacional</div>
-            <div class="update">✅ Atualizado: 18/05/2026 21:31 | BASE: OS Única PRISMA (219 OSs)</div>
+            <div class="header-content">
+                <!-- Logo Esquerda - Ability -->
+                <img src="Ability.png" alt="Ability" class="logo">
+                
+                <!-- Conteúdo Central -->
+                <div class="header-center">
+                    <h1>🏢 DASHBOARD DE GESTÃO - SLA OSs FATB SUL</h1>
+                    <div class="subtitle">Monitoramento e Análise de Performance Operacional</div>
+                    <div class="update">✅ Atualizado: 18/05/2026 21:36 | BASE: OS Única PRISMA (219 OSs)</div>
+                </div>
+                
+                <!-- Logos Direita - Gestão e Prisma -->
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <img src="Gestão.png" alt="Gestão" class="logo">
+                    <img src="Prisma.png" alt="Prisma" class="logo">
+                </div>
+            </div>
         </div>
         
         <!-- KPIs -->
@@ -294,3 +325,4 @@
     </div>
 </body>
 </html>
+
